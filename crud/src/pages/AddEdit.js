@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {  useLocation } from "react-router-dom";
+import {  useLocation, useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
 import axios from "axios";
@@ -16,9 +16,24 @@ const initialState = {
 const AddEdit = () => {
   const [state, setState] = useState(initialState);
 
-  const { name, email, contact } = initialState;
+  const { name, email, contact } = state;
 
   const navigate = useNavigate();
+
+  const {id} = useParams()
+
+  useEffect(()=> {
+    if(id){
+      getSingleUser(id);
+    }
+  }, [id])
+
+   const getSingleUser =  async (id) => {
+    const response = await axios.get(`http://localhost:5000/user/${id}`)
+    if(response.status === 200){
+      setState({...response.data[0]})        
+    }
+  }
 
   const addContact = async (data) => {
     const response = await axios.post("http://localhost:5000/user", data);
@@ -34,7 +49,8 @@ const AddEdit = () => {
       toast.error("Please provide value into each input field");
     } else {
       addContact(state);
-      navigate("/");
+    
+      setTimeout(()=>  navigate("/"), 500)
     }
   };
   const handleInputChange = (e) => {
@@ -60,7 +76,7 @@ const AddEdit = () => {
           name="name"
           placeholder="Entre Name ..."
           onChange={handleInputChange}
-          value={name}
+          value={state.name}
         />
         <label htmlFor="email"> Email</label>
         <input
@@ -69,7 +85,7 @@ const AddEdit = () => {
           name="email"
           placeholder="Entre Email ..."
           onChange={handleInputChange}
-          value={email}
+          value={state.email}
         />
         <label htmlFor="contact"> Contact</label>
         <input
@@ -78,9 +94,9 @@ const AddEdit = () => {
           name="contact"
           placeholder="Entre Number ..."
           onChange={handleInputChange}
-          value={contact}
+          value={state.contact}
         />
-        <input type="submit" value="Add" />
+        <input type="submit" value={id ? "Update" : "Add"} />
       </form>
     </div>
   );
