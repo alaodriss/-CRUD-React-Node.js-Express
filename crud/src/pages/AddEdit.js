@@ -35,8 +35,16 @@ const AddEdit = () => {
     }
   }
 
-  const addContact = async (data) => {
+  const addUser = async (data) => {
     const response = await axios.post("http://localhost:5000/user", data);
+    console.log(response)
+    if (response.status === 200) {
+      toast.success(response.data);
+    }
+  };
+
+  const updateUser = async (data, id) => {
+    const response = await axios.put(`http://localhost:5000/user/${id}`, data);
     console.log(response)
     if (response.status === 200) {
       toast.success(response.data);
@@ -48,7 +56,12 @@ const AddEdit = () => {
     if (!name || !email || !contact) {
       toast.error("Please provide value into each input field");
     } else {
-      addContact(state);
+      if(!id)
+          {
+            addUser(state);
+          } else{
+             updateUser(state, id)
+          }     
     
       setTimeout(()=>  navigate("/"), 500)
     }
